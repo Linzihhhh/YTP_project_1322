@@ -5,9 +5,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
-import time
-import random
-import requests
+import time,random,requests,os,dotenv
+
+#loading .env
+dotenv.load_dotenv()
+ACCOUNT = os.getenv("ACCOUNT")
+PASSWORD = os.getenv("PASSWORD")
 
 #the class names on pixiv
 classname = {
@@ -20,9 +23,6 @@ classname = {
     "pictures":"sc-1qpw8k9-3.eAvtpu"
 }
 
-account = '' #your account
-password = '' #your password
-
 #open the website with headless
 chrome_options = Options()
 chrome_options.add_argument('--headless') 
@@ -33,9 +33,9 @@ driver.get(url)
 
 #login
 element = driver.find_element(By.CLASS_NAME, classname["account"])
-element.send_keys(account)
+element.send_keys(ACCOUNT)
 element = driver.find_element(By.CLASS_NAME, classname["password"])
-element.send_keys(password)
+element.send_keys(PASSWORD)
 button = driver.find_element(By.CLASS_NAME, classname["login"])
 button.click()
 
