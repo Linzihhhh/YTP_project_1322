@@ -25,11 +25,11 @@ classname = {
 
 #open the website with headless
 chrome_options = Options()
-chrome_options.add_argument('--headless') 
+chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
 driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),chrome_options=chrome_options)
 url = 'https://www.pixiv.net/login.php?ref=wwwtop_accounts_index'
-driver.get(url) 
+driver.get(url)
 
 #login
 element = driver.find_element(By.CLASS_NAME, classname["account"])
@@ -43,16 +43,16 @@ button.click()
 WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME,classname["recommend_pic"])))
 
 #find the picture
-items = driver.find_elements(By.CLASS_NAME, classname["recommend_pic"])
-tar = items[0]
-for i in items:
-    if i.get_attribute("data-gtm-recommend-score") > tar.get_attribute("data-gtm-recommend-score"):
+pictures = driver.find_elements(By.CLASS_NAME, classname["recommend_pic"])
+target = pictures[0]
+for i in pictures:
+    if i.get_attribute("data-gtm-recommend-score") > target.get_attribute("data-gtm-recommend-score"):
         if random.randint(1,100) > 30:
-            tar = i
-goodpicture_url = tar.get_attribute("href")
+            target = i
+picture_url = target.get_attribute("href")
 
 #go to target picture
-driver.get(goodpicture_url)
+driver.get(picture_url)
 WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, classname["picture_div"])))
 
 #find the picture url
@@ -69,13 +69,12 @@ headers = {
     'User-Agent' : "user_agent",
     'referer':url
 }
-pic = requests.get(url,headers=headers)
+image = requests.get(url,headers=headers)
 
 #generate the picture
 timestr = time.strftime("%Y%m%d-%H%M%S")
-file = open(f"{timestr}.png", "wb")
-file.write(pic.content)
-file.close()
+with open(f"{timestr}.png", "wb") as file:
+    file.write(image.content)
 
 #close the website
 driver.quit()
