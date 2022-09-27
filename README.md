@@ -1,6 +1,6 @@
 # YTP_project_GrandTiger
 
-## info
+## Info
 YTP 第七屆專題競賽
 
 組名：Grantiger
@@ -13,9 +13,15 @@ YTP 第七屆專題競賽
 
 指導業師：精誠科技講師
 
-練習項目
-1. GitHub & VSCode 開發環境安裝與設定 9/6
-
-2. 爬蟲 9/13
-
-3.[ML](https://hackmd.io/iDKvVVa9Q7OgE4Ju03Zu8w?view) 
+## Schedule
+| 周次|項目| 日期|
+|:---:|:---:|:----:|
+|1|GitHub & VSCode 開發環境安裝與設定|9/6|
+|2|Web Scrapying|9/13|
+|3|Object Oriented Programming|9/20|
+|4|[Machine learning](https://hackmd.io/@im72_DVuSzmn6EaVL1SDmQ/BJDOHPBWo)|9/27|
+|5|[Natural Language Processing](https://hackmd.io/@q3F5smA6Re6SDm0uqgMogA/Sy8grJ8bo)|10/4|
+|6||10/11|
+|7||10/18|
+|8||10/25|
+|9||11/1|
