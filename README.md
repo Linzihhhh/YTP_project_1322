@@ -18,4 +18,4 @@ YTP 第七屆專題競賽
 
 2. 爬蟲 9/13
 
-3.[ML](https://hackmd.io/iDKvVVa9Q7OgE4Ju03Zu8w?both) 
+3.[ML](https://hackmd.io/iDKvVVa9Q7OgE4Ju03Zu8w?view) 
