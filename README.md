@@ -17,8 +17,8 @@ YTP 第七屆專題競賽
 | 周次|項目| 日期|
 |:---:|:---:|:----:|
 |1|GitHub & VSCode 開發環境安裝與設定|9/6|
-|2|Web Scrapying|9/13|
-|3|Object Oriented Programming|9/20|
+|2|[Web Scrapying](https://hackmd.io/@tyrso/S1wr2T4xs)|9/13|
+|3|[Machine learning](https://github.com/kennychenfs/YTP-2022/blob/main/Week%203:%20ML.md) & [OOP](https://github.com/kennychenfs/YTP-2022/blob/main/Week%203:%20OOP.md)|9/20|
 |4|[Machine learning](https://hackmd.io/@im72_DVuSzmn6EaVL1SDmQ/BJDOHPBWo)|9/27|
 |5|[Natural Language Processing](https://hackmd.io/@q3F5smA6Re6SDm0uqgMogA/Sy8grJ8bo)|10/4|
 |6||10/11|
