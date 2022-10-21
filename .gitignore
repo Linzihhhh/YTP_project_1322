@@ -1,3 +1,4 @@
 .env
 poetry.lock
 pyproject.toml
+.vscode

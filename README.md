@@ -21,7 +21,7 @@ YTP 第七屆專題競賽
 |3|[Machine learning](https://github.com/kennychenfs/YTP-2022/blob/main/Week%203:%20ML.md) & [OOP](https://github.com/kennychenfs/YTP-2022/blob/main/Week%203:%20OOP.md)|9/20|
 |4|[Machine learning](https://hackmd.io/@im72_DVuSzmn6EaVL1SDmQ/BJDOHPBWo)|9/27|
 |5|[Natural Language Processing](https://hackmd.io/@q3F5smA6Re6SDm0uqgMogA/Sy8grJ8bo)|10/4|
-|6||10/11|
-|7||10/18|
+|6|Natural Language Processing|10/18|
+|7|[Deep Learning](https://hackmd.io/@K_BWZMWvQDSnp1ywD_ditQ/H1sPGQBQi)|10/18|
 |8||10/25|
 |9||11/1|
