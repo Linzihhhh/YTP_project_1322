@@ -5,7 +5,7 @@ class YoutubeMusicDownloader:
     def __init__(self):
         self.ydl_opts = {
             'format': 'bestaudio', # test
-            'outtmpl': '%(extractor_key)s\%(title)s.%(ext)s',
+            'outtmpl': 'main\music\%(title)s.%(ext)s',
             # 'outtmpl': '%(extractor_key)s\%(title)s.mp3',
             'default_search': 'auto',
             # 'cookiefile': 'youtube.com_cookies.txt', # <- this can download age-restricted video
@@ -22,7 +22,3 @@ class YoutubeMusicDownloader:
                     print('Join this channel to get access to members-only content like this video, and other exclusive perks.')
             except Exception as ex:
                 print('\n', type(ex).__name__)
-
-    
-ytdl = YoutubeMusicDownloader()
-ytdl.download("url")
