@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 import yt_dlp, urllib.error
+import os
 
 class YoutubeMusicDownloader:
     def __init__(self):
         self.ydl_opts = {
             'format': 'bestaudio', # test
-            'outtmpl': 'main\music\%(title)s.%(ext)s',
+            'outtmpl': '\main\song\%(title)s.%(ext)s',
             # 'outtmpl': '%(extractor_key)s\%(title)s.mp3',
             'default_search': 'auto',
             # 'cookiefile': 'youtube.com_cookies.txt', # <- this can download age-restricted video

@@ -2,3 +2,6 @@
 poetry.lock
 pyproject.toml
 .vscode
+audiodata
+song
+__pycache__
