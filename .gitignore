@@ -3,5 +3,5 @@ poetry.lock
 pyproject.toml
 .vscode
 audiodata
-song
+trainingsong
 __pycache__
