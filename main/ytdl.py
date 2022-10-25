@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+import os
 import subprocess
 
 class YoutubeMusicDownloader:
@@ -15,11 +15,12 @@ class YoutubeMusicDownloader:
         title = process.stdout.decode().strip()
         return title + " - " + id
 
-    def download(self, url: str, title=None):
+    def download(self, url: str, *, path=None, title=None):
         try:
+            path = path or os.getcwd()
             title = title or self.generate_title(url)
 
-            process = subprocess.run(f"youtube-dl --extract-audio --audio-format wav -o \"{title}.wav\" \"{url}\"")
+            process = subprocess.run(f"youtube-dl --extract-audio --audio-format wav -o \"{path}\\{title}.wav\" \"{url}\"")
             process.check_returncode()
 
         except Exception as e:
@@ -27,4 +28,4 @@ class YoutubeMusicDownloader:
             
     
 ytdl = YoutubeMusicDownloader()
-ytdl.download("[URL]")
+ytdl.download("https://www.youtube.com/watch?v=5MWdriB3EBM")
