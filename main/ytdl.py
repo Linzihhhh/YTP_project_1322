@@ -1,25 +1,30 @@
 from __future__ import unicode_literals
-import yt_dlp, urllib.error
-import os
+import subprocess
 
 class YoutubeMusicDownloader:
     def __init__(self):
-        self.ydl_opts = {
-            'format': 'bestaudio', # test
-            'outtmpl': '\main\song\%(title)s.%(ext)s',
-            # 'outtmpl': '%(extractor_key)s\%(title)s.mp3',
-            'default_search': 'auto',
-            # 'cookiefile': 'youtube.com_cookies.txt', # <- this can download age-restricted video
-        }
+        pass
+    
+    def generate_title(self, url: str):
+        process = subprocess.run(f"youtube-dl --get-id \"{url}\"", capture_output=True)
+        process.check_returncode()
+        id = process.stdout.decode().strip()
+        print(id)
+        process = subprocess.run(f"youtube-dl --get-title \"{url}\"", capture_output=True)
+        process.check_returncode()
+        title = process.stdout.decode().strip()
+        return title + " - " + id
 
-    def download(self, url: str):
-        with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
-            try:
-                ydl.download([url])
-            except yt_dlp.utils.DownloadError as DownloadError:
-                if type(DownloadError.exc_info[1]) == urllib.error.URLError:
-                    print('Unknown Url')
-                elif type(DownloadError.exc_info[1]) == yt_dlp.utils.ExtractorError:
-                    print('Join this channel to get access to members-only content like this video, and other exclusive perks.')
-            except Exception as ex:
-                print('\n', type(ex).__name__)
+    def download(self, url: str, title=None):
+        try:
+            title = title or self.generate_title(url)
+
+            process = subprocess.run(f"youtube-dl --extract-audio --audio-format wav -o \"{title}.wav\" \"{url}\"")
+            process.check_returncode()
+
+        except Exception as e:
+            print(e)
+            
+    
+ytdl = YoutubeMusicDownloader()
+ytdl.download("[URL]")
