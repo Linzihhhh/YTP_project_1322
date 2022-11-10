@@ -19,3 +19,11 @@ class batcher:
         batched_data=np.array(data_list)
         return batched_data
     
+    def batch_all(self,x_data,y_data,batch_size,message=False):
+        
+        batch_x=self.batch(x_data,batch_size,message)
+        batch_y=self.batch(y_data,batch_size,message)
+        
+        return batch_x,batch_y
+        
+    
