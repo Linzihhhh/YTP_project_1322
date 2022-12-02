@@ -1,13 +1,12 @@
-from typing import *
-from sklearn import svm
-import spacy
-import joblib
+import nltk, spacy, joblib, re
+from langdetect import detect
 from textblob import TextBlob
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
-import nltk
+from typing import *
+from sklearn import svm
 
 class Nlp:
     def __init__(self):
@@ -20,24 +19,30 @@ class Nlp:
         return tag
 
     def text_process(self, phrase:str)->str:
-
+        
         lemmatizer = WordNetLemmatizer()
         stemmer = PorterStemmer()
         tokenizer = RegexpTokenizer(r'\w+')
         stop_words = stopwords.words('english')
-        
-        words = tokenizer.tokenize(phrase)
 
-        stripped_phrase = []
+        regex = r"(?i)([0-9])|(\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’])))"
+        phrase = re.sub(regex, '', phrase) #remove number and url from phrase
+
+        if detect(phrase) != 'en':
+            raise KeyError
+
+        words = tokenizer.tokenize(phrase) #remove punctuation
+
+        stripped_phrase = []  #remove stopwords
         for word in words:
             if word not in stop_words:
                 stripped_phrase.append(word)
 
-        stemmed_words = []
+        stemmed_words = [] #stemming
         for word in stripped_phrase:
             stemmed_words.append(stemmer.stem(word))
 
-        lemmatized_words = []
+        lemmatized_words = [] #lemmatization
         for word in stemmed_words:
             lemmatized_words.append(lemmatizer.lemmatize(word, self.get_wordnet_pos(word)))
 
@@ -54,15 +59,16 @@ class Nlp:
         this two list's size should be same
         """
         if len(x_data) != len(y_data):
-            return
+            raise KeyError
         train_x = []
         for phrases in x_data:
             all_phrase = []
             for phrase in phrases:
-                lang = TextBlob(phrase)
-                if lang.detect_language() != 'en':
-                    continue
-                all_phrase.append(self.text_process(phrase))
+                try:
+                    words = self.text_process(phrase)
+                    all_phrase.append(words)
+                except:
+                    pass
             train_x.append(" ".join(all_phrase))
 
         nlp = self.nlp

@@ -41,16 +41,16 @@ class YoutubeMusicDownloader:
 
             filename = path + "/" + id
             process = subprocess.run(
-                f'yt-dlp --ignore-errors --write-comments --no-download -o "{filename}" {url} --extractor-args "youtube:max-comments={max_comments},all,{max_replies},all";')
-
-            with open(f"{filename}.info.json", "r") as f:
+                f'yt-dlp --ignore-errors --write-comments --no-download -o "{filename}" {url} --extractor-args "youtube:max-comments={max_comments},all,{max_replies},all";') 
+            
+            with open(f"{filename}.info.json", "r", encoding='utf_8') as f:
                 data = json.load(f)
 
             data = data["comments"]
-            
-            with open(f"{filename}.json", "w") as f:
+
+            with open(f"{filename}.json", "w", encoding='utf_8') as f:
                 json.dump(data, f)
-            
+
             os.remove(f"{filename}.info.json")
 
         except Exception as e:
