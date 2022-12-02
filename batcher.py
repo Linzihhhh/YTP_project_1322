@@ -5,7 +5,7 @@ class batcher:
         return
     def batch(self,data,batch_size,message=False):
         data_list=[]
-        while(data.shape[0]>=batch_size):      #1000*20 
+        while(data.shape[0]>=batch_size):
             x,data=np.vsplit(data,[batch_size])
             data_list.append(x)
             #print(x.shape)
