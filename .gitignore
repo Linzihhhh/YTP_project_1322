@@ -6,3 +6,4 @@ audiodata
 trainingsong
 __pycache__
 model.joblib
+test.py

@@ -18,14 +18,26 @@ class Dataset:
         if not os.path.exists(self.batched_path):
             os.makedirs(self.batched_path)
     
-    def download(self, url:str):
-        self.ytdl.download(url,root = self.music_path)
+    def download(self, urls):
+        """
+        `url` can be `str` or `list`
+
+        Download songs from youtube to file
+        """
+        if isinstance(urls, str):
+            self.ytdl.download(urls,root = self.music_path)
+        else:
+            for url in urls:
+                self.ytdl.download(url,root = self.music_path)
     
-    def downloads(self, urls:list):
-        for url in urls:
-            self.ytdl.download(url,path = self.music_path)
     
     def general_music_data(self):
+        """
+        use all the music to general a MFCC numpy
+
+        delete all the object in the unbatch folder
+        and general a numpy in unbatch folder
+        """
         timestr = time.strftime("%Y%m%d-%H%M%S")
         folders = os.listdir(self.music_path)
         lists = []
@@ -46,8 +58,12 @@ class Dataset:
         
         np.save(self.unbatch_path + timestr, all_data)
     
+    def batch(self,batch_size:int,message=False):
+        """
+        `batch_size` determine how many song will be in one numpy
 
-    def batch(self,batch_size,message=False):
+        batch the unbatch numpy and genenral the batched numpy 
+        """
         data_list=[]
         timestr = time.strftime("%Y%m%d-%H%M%S")
 
