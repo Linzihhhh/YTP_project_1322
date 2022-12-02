@@ -5,3 +5,4 @@ pyproject.toml
 audiodata
 trainingsong
 __pycache__
+model.joblib
