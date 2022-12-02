@@ -31,7 +31,7 @@ class YoutubeMusicDownloader:
         except Exception as e:
             print(e)
 
-    def fetch_comment(self, id: str, *, path: str = None):
+    def fetch_comment(self, id: str, *, path: str = None, max_comments: int = 2000, max_replies: int = 0):
         """
         Download comments from a video
         """
@@ -41,7 +41,7 @@ class YoutubeMusicDownloader:
 
             filename = path + "/" + id
             process = subprocess.run(
-                f'yt-dlp --ignore-errors --write-comments --no-download -o "{filename}" {url}')
+                f'yt-dlp --ignore-errors --write-comments --no-download -o "{filename}" {url} --extractor-args "youtube:max-comments={max_comments},all,{max_replies},all";')
 
             with open(f"{filename}.info.json", "r") as f:
                 data = json.load(f)
