@@ -38,5 +38,6 @@ class CNN(nn.Module):
         x=nn.functional.relu(self.nn1(x))
         x=self.nn2(x)
         return x
+cnn=CNN()
 
-
+torch.save(cnn,'Classification model.pt')
