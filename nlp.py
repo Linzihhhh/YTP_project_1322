@@ -22,7 +22,7 @@ class Nlp:
         
         lemmatizer = WordNetLemmatizer()
         stemmer = PorterStemmer()
-        tokenizer = RegexpTokenizer(r'\w+')
+        tokenizer = RegexpTokenizer(r'\w+') 
         stop_words = stopwords.words('english')
 
         regex = r"(?i)([0-9])|(\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’])))"
