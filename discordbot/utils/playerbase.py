@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands, Interaction
-from discord import VoiceClient, VoiceChannel
+from discord import VoiceClient, VoiceChannel, StageChannel, VoiceState
 from discord import Guild
 
 class PlayerBase:
@@ -15,8 +15,7 @@ class PlayerBase:
 
     async def _summon(self, channel: VoiceChannel):
         voice_client: VoiceClient = channel.guild.voice_client
-        if voice_client is None:
-            return
+        self._join(channel)
         if voice_client.is_playing():
             voice_client.pause()
         await voice_client.move_to(channel)
@@ -56,38 +55,62 @@ class PlayerBase:
 class PlayerBaseCog(PlayerBase, commands.Cog):
     def __init__(self):
         super().__init__()
+    
+    async def _connentable_channel(self, interaction: Interaction):
+        if not isinstance(interaction.user.voice.channel, discord.channel.VocalGuildChannel):
+            await interaction.response.send_message("Please enter a voice channel first", ephemeral=True)
+            return False
+        return True
+
+    @commands.Cog.listener(name="on_voice_state_update")
+    async def on_audience_all_left(self, member: discord.Member, before: VoiceState, after: VoiceState):
+        voice_client: VoiceClient = member.guild.voice_client
+        if len(voice_client.channel.members) == 0:
+            self._pause()
 
     @app_commands.command(name="join", description="owo")
-    async def join(self, interacion: Interaction):
-        await self._join(interacion.user.voice.channel)
-        await interacion.response.send_message("hello", ephemeral=True)
+    async def join(self, interaction: Interaction):
+        if not self._connentable_channel(interaction):
+            return
+        await self._join(interaction.user.voice.channel)
+        await interaction.response.send_message("hello", ephemeral=True)
 
     @app_commands.command(name="summon", description="oao")
-    async def summon(self, interacion: Interaction):
-        await self._summon(interacion.user.voice.channel)
-        await interacion.response.send_message("summon", ephemeral=True)
+    async def summon(self, interaction: Interaction):
+        if not self._connentable_channel(interaction):
+            return
+        await self._summon(interaction.user.voice.channel)
+        await interaction.response.send_message("summon", ephemeral=True)
 
     @app_commands.command(name="leave", description="ouo")
-    async def leave(self, interacion: Interaction):
-        await self._leave(interacion.guild)
-        await interacion.response.send_message("byebye", ephemeral=True)
+    async def leave(self, interaction: Interaction):
+        await self._leave(interaction.guild)
+        await interaction.response.send_message("byebye", ephemeral=True)
 
     @app_commands.command(name="play", description="Play the song or playlist you want")
     async def play(self, interaction: Interaction, qstring: str):
+        if not self._connentable_channel(interaction):
+            return
         await self._play(interaction.user.voice.channel, discord.FFmpegPCMAudio(qstring))
         await interaction.response.send_message("Succeed to play the music")
 
     @app_commands.command(name="pause", description="Pause the current playing audio")
     async def pause(self, interaction: Interaction):
-        await self._pause(interaction.guild)
-        await interaction.response.send_message("Succeed to pause the current playing music")
+        voice_client: VoiceClient = interaction.guild.voice_client
+        if voice_client is not None and voice_client.is_playing():
+            await self._pause(interaction.guild)
+            await interaction.response.send_message("Succeed to pause the current playing music")
 
     @app_commands.command(name="resume", description="Resume the current paused audio")
     async def resume(self, interaction: Interaction):
-        await self._resume(interaction.guild)
-        await interaction.response.send_message("Succeed to resume the current paused music")
+        voice_client: VoiceClient = interaction.guild.voice_client
+        if voice_client is not None and voice_client.is_paused():
+            await self._resume(interaction.guild)
+            await interaction.response.send_message("Succeed to resume the current paused music")
 
     @app_commands.command(name="skip", description="Skip the current playing audio")
     async def skip(self, interaction: Interaction):
-        await self._skip(interaction.guild)
-        await interaction.response.send_message("Succeed to pause the current playing music")
+        voice_client: VoiceClient = interaction.guild.voice_client
+        if voice_client is not None and (voice_client.is_playing() or voice_client.is_paused()):
+            await self._skip(interaction.guild)
+            await interaction.response.send_message("Succeed to skip the current playing music")
