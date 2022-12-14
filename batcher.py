@@ -25,5 +25,9 @@ class batcher:
         batch_y=self.batch(y_data,batch_size,message)
         
         return batch_x,batch_y
-        
+    def get_sequent_with_single_label(self,y,length):
+        seq_y=np.zeros((y.shape[0],length))
+        for i in range(y.shape[0]):
+            seq_y[i][y[i]]=1
+        return seq_y
     
