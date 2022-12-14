@@ -27,7 +27,7 @@ class PlayerBase:
         if voice_client is not None:
             await voice_client.disconnect()
 
-    async def _play(self, channel: VoiceChannel, source: discord.FFmpegPCMAudio):
+    async def _play_source(self, channel: VoiceChannel, source: discord.FFmpegPCMAudio):
         """
         Retrieve a playable source and play it
         """
@@ -56,28 +56,28 @@ class PlayerBaseCog(PlayerBase, commands.Cog):
     def __init__(self):
         super().__init__()
     
-    async def _connentable_channel(self, interaction: Interaction):
+    async def _connectable_channel(self, interaction: Interaction) -> bool:
         if not isinstance(interaction.user.voice.channel, discord.channel.VocalGuildChannel):
             await interaction.response.send_message("Please enter a voice channel first", ephemeral=True)
             return False
         return True
 
     @commands.Cog.listener(name="on_voice_state_update")
-    async def on_audience_all_left(self, member: discord.Member, before: VoiceState, after: VoiceState):
+    async def on_no_audiences(self, member: discord.Member, before: VoiceState, after: VoiceState):
         voice_client: VoiceClient = member.guild.voice_client
         if len(voice_client.channel.members) == 0:
             self._pause()
 
     @app_commands.command(name="join", description="owo")
     async def join(self, interaction: Interaction):
-        if not self._connentable_channel(interaction):
+        if not await self._connectable_channel(interaction):
             return
         await self._join(interaction.user.voice.channel)
         await interaction.response.send_message("hello", ephemeral=True)
 
     @app_commands.command(name="summon", description="oao")
     async def summon(self, interaction: Interaction):
-        if not self._connentable_channel(interaction):
+        if not self._connectable_channel(interaction):
             return
         await self._summon(interaction.user.voice.channel)
         await interaction.response.send_message("summon", ephemeral=True)
@@ -86,13 +86,6 @@ class PlayerBaseCog(PlayerBase, commands.Cog):
     async def leave(self, interaction: Interaction):
         await self._leave(interaction.guild)
         await interaction.response.send_message("byebye", ephemeral=True)
-
-    @app_commands.command(name="play", description="Play the song or playlist you want")
-    async def play(self, interaction: Interaction, qstring: str):
-        if not self._connentable_channel(interaction):
-            return
-        await self._play(interaction.user.voice.channel, discord.FFmpegPCMAudio(qstring))
-        await interaction.response.send_message("Succeed to play the music")
 
     @app_commands.command(name="pause", description="Pause the current playing audio")
     async def pause(self, interaction: Interaction):
