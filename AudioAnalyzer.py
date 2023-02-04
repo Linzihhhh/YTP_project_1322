@@ -47,7 +47,7 @@ class AudioAnalyzer:
     def save(self, data, path):
         np.save(path, data)
         
-    def read(self,f, normalized=False):
+    def get_raw_data(self,f, normalized=False):
         """MP3 to numpy array"""
         a = pydub.AudioSegment.from_mp3(f)
         y = np.array(a.get_array_of_samples())
