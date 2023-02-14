@@ -1,10 +1,12 @@
 import torch
+import torch.nn as nn
+from sklearn.metrics import accuracy_score
 import numpy as np
 import pandas as pd
-import torch.nn as nn
-import torch.nn.functional as function 
-from batcher import batcher
-
+def output(x):
+    x=torch.max(x,dim=1)[1]
+    x=x.data.numpy().squeeze()
+    return x
 class ANN(nn.Module):
     def __init__(self):
         super(ANN,self).__init__()
@@ -17,19 +19,16 @@ class ANN(nn.Module):
         x=nn.functional.softmax(x)
         
         return x
-
+'''
 ann=ANN()
-f=pd.read_csv('Categories data.csv')
+f=pd.read_csv('Categories data.csv',dtype=float)
 data=f.to_numpy()
 x=data[:,:2]
 y=data[:,2]
-bat=batcher()
 
 optimizer=torch.optim.Adam(ann.parameters(),lr=0.001)
-loss_function=torch.nn.BCELoss()
+loss_function=torch.nn.CrossEntropyLoss()
 Epochs=5000
-
-y=bat.get_sequent_with_single_label(y, 11)
 
 x=torch.from_numpy(x)
 y=torch.from_numpy(y)
@@ -38,11 +37,11 @@ y=y.float()
 for i in range(Epochs):
     optimizer.zero_grad()
     y_pred=ann(x)
-    loss=loss_function(y_pred,y)
+    loss=loss_function(y_pred,y.long())
     loss.backward()
     optimizer.step()
 y_pred=ann(x)
-print(y_pred[0].data.numpy())
-torch.save(ann,'Multiple-Labeled classifier.pt')
-
+print(accuracy_score(y, output(y_pred)))
+torch.save(ann,'SingleLabeledANN.pt')
+'''
 
