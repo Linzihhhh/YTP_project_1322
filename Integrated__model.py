@@ -1,15 +1,14 @@
 import torch
 import numpy as np
 from AudioAnalyzer import AudioAnalyzer
-from singlelabel_classifier import ANN 
-from multilabel_classifier import mANN
-from sklearn.neighbors import KNeighborsClassifier
-import joblib
+from Models_module import mANN,ANN,RNN
+from batcher import batcher
 
 class IntegratedModel:
     def __init__(self):
         
-        aa=AudioAnalyzer()
+        self.aa=AudioAnalyzer()
+        self.batcher=batcher()
         return
     
     def output(self,x):
@@ -36,17 +35,30 @@ class IntegratedModel:
             '''un finished'''
             return
         
-    def train_model(self):
+    def train_classify_model(self,):
         return
     
     def train_all_model(self):
-        return
+        return 
+    def predict_score(self,data,use_model=0):
+        ''' 2=CQT with ANN, 1=MFCC+STFT with CNN 0= raw_data+RNN'''
+        
+        return 
     
-    def get_data(self):
-        return
-    
-    def predict_avscore(self):
-        return
+    def get_data(self,file_path,time_size,datatype=0):
+        '''datatype 0=Raw data 1= Analyzed_ALL data, 2=CQT data'''
+        if datatype==1:
+            data=self.aa.analyze_ALL(file_path, time_size)
+            return data
+        
+        if datatype==0:
+            data=self.aa.get_raw_data(file_path)
+            return data
+        if datatype==2:
+            data=self.aa.analyze_CQT(file_path, time_size)
+            return
+        
+       
     
     
         
