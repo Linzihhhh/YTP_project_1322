@@ -4,7 +4,7 @@ from AudioAnalyzer import AudioAnalyzer
 from Models_module import mANN,ANN,RNN
 from batcher import batcher
 
-class IntegratedModel:
+class IntegratedTools:
     def __init__(self):
         
         self.aa=AudioAnalyzer()
@@ -32,7 +32,7 @@ class IntegratedModel:
                 matrix=self.output(matrix)
                 return matrix
         if use_algorithm==2:
-            '''un finished'''
+            '''unfinished'''
             return
         
     def train_classify_model(self,):
@@ -40,10 +40,16 @@ class IntegratedModel:
     
     def train_all_model(self):
         return 
+    
     def predict_score(self,data,use_model=0):
         ''' 2=CQT with ANN, 1=MFCC+STFT with CNN 0= raw_data+RNN'''
         if use_model==0:
-             
+            rnn=torch.load('Models/AVscore_predictor_rnn.pt')
+            matrix=rnn(torch.FloatTensor(data).view(-1,18,20000))
+            matrix=matrix.data.numpy()
+            return matrix
+        if use_model==1:
+            '''not finished'''
     
     def get_data(self,file_path,time_size,datatype=0):
         '''datatype 0=Raw data 1= Analyzed_ALL data, 2=CQT data'''
@@ -53,12 +59,27 @@ class IntegratedModel:
             return data
         
         if datatype==0:
+            ''' mp3 only'''
             sr,data=self.aa.get_raw_data(file_path)
-            data=data[:sr*time_size,0]
+            data=data[:,0]
+            data=data[:sr*time_size]
             return data
+        
         if datatype==2:
             data=self.aa.analyze_CQT(file_path, time_size)
             return
+    def get_class_with_path(self,file_path,use_algorithm=0,time_size=45):
+        '''0 RNN, 1 MFCC CNN, 2 CQT MLP'''
+        
+        data=self.get_data(file_path, time_size)
+        score=self.predict_score(data)
+        print(score)
+        classes=self.get_classes(score[0,0],score[0,1])
+        return classes
+
+aa=IntegratedTools()
+print(aa.get_class_with_path('Local/Youtube/1.mp3'))
+        
         
        
     
