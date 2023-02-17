@@ -42,17 +42,19 @@ class IntegratedModel:
         return 
     def predict_score(self,data,use_model=0):
         ''' 2=CQT with ANN, 1=MFCC+STFT with CNN 0= raw_data+RNN'''
-        
-        return 
+        if use_model==0:
+             
     
     def get_data(self,file_path,time_size,datatype=0):
         '''datatype 0=Raw data 1= Analyzed_ALL data, 2=CQT data'''
+        '''please enter time_size with second'''
         if datatype==1:
             data=self.aa.analyze_ALL(file_path, time_size)
             return data
         
         if datatype==0:
-            data=self.aa.get_raw_data(file_path)
+            sr,data=self.aa.get_raw_data(file_path)
+            data=data[:sr*time_size,0]
             return data
         if datatype==2:
             data=self.aa.analyze_CQT(file_path, time_size)

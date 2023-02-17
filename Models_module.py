@@ -7,8 +7,8 @@ from torch.nn import functional as function
 class RNN(nn.Module):
     def __init__(self):
         super(RNN,self).__init__()
-        self.rnn=nn.LSTM(40000,800,5,batch_first=True)
-        self.out=nn.Linear(800,300)
+        self.rnn=nn.LSTM(20000,1000,5,batch_first=True)
+        self.out=nn.Linear(1000,300)
         self.net=nn.Sequential(
             nn.Linear(300,50),
             nn.LeakyReLU(),
