@@ -47,9 +47,15 @@ class AudioAnalyzer:
     def save(self, data, path):
         np.save(path, data)
         
+    def sample_rate(self,a,sr=8000):
+        
+        a=a.set_frame_rate(sr)
+        return a
+        
     def get_raw_data(self,f, normalized=False):
         """MP3 to numpy array"""
         a = pydub.AudioSegment.from_mp3(f)
+        a=self.sample_rate(a,8000)
         y = np.array(a.get_array_of_samples())
         if a.channels == 2:
             y = y.reshape((-1, 2))
@@ -57,6 +63,7 @@ class AudioAnalyzer:
             return a.frame_rate, np.float32(y) / 2**15
         else:
             return a.frame_rate, y
+    
 
 '''debug
 a=AudioAnalyzer()
