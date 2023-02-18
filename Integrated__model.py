@@ -40,6 +40,8 @@ class IntegratedTools:
         return
     
     def train_Liking_score_model(self,user_score,data_path,data_type=0):
+        ''' input user_score and data_path to train the liking_score model'''
+        
         R=torch.load('Models/likingscore_predict_model.pt')
         optim=torch.optim.Adam(R.parameters(),lr=0.01)
         loss_function=torch.nn.MSELoss()
@@ -51,8 +53,10 @@ class IntegratedTools:
         loss=loss_function(score,torch.FloatTensor(user_score))
         loss.backward()
         optim.step()
+        
+        
         torch.save(R,'Models/likingscore_predict_model.pt')
-        return True
+        return print('Train_successfully')
     
     def predict_score(self,data,use_model=0):
         ''' 2=CQT with ANN, 1=MFCC+STFT with CNN 0= raw_data+RNN'''
@@ -123,7 +127,7 @@ class IntegratedTools:
             return score
             
 aa=IntegratedTools()
-print(aa.train_Liking_score_model(100,'Local/Youtube/1.mp3' ))
+aa.train_Liking_score_model(95, 'Local/Youtube/1.mp3')
         
         
        
