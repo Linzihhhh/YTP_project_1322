@@ -47,6 +47,22 @@ class mANN(nn.Module):
         
         return x
 
+class Rnn(nn.Module):
+    def __init__(self):
+        super(Rnn,self).__init__()
+        self.rnn=nn.LSTM(20000,1000,5,batch_first=True)
+        self.out=nn.Linear(1000,300)
+        self.net=nn.Sequential(
+            nn.Linear(300,200),
+            nn.LeakyReLU(),
+            nn.Linear(200,1)
+            )
+    def forward(self,x):
+        x=x.to(torch.float32)
+        r_out,(h_n,h_c)=self.rnn(x)
+        x=self.out(r_out[:,-1,:])
+        x=self.net(x)
+        return x
 
 
         

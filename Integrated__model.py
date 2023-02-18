@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 from AudioAnalyzer import AudioAnalyzer
-from Models_module import mANN,ANN,RNN
+from Models_module import mANN,ANN,RNN,Rnn
 from batcher import batcher
-import heapq
+
 
 class IntegratedTools:
     def __init__(self):
@@ -101,13 +101,17 @@ class IntegratedTools:
         que.sort(reverse=True)
         return que
         
-    def Get_Liking_score(self,data,data_type=0):
+    def Get_Liking_score_with_path(self,data,data_type=0):
         '''data_type=0 raw_data, =1 AnalyzedAll_data, =2 CQT data'''
-        if data_type==1:
-            return
+        if data_type==0:
+            data=self.get_data(data, 45)
+            Rnn=torch.load('Models/likingscore_predict_model.pt')
+            matrix=Rnn(torch.FloatTensor(data).view(-1,18,20000))
+            score=matrix.data.numpy()
+            return score
             
 aa=IntegratedTools()
-print(aa.get_class_with_path('Local/Youtube/1.mp3'))
+print(aa.Get_Liking_score_with_path('Local/Youtube/1.mp3'))
 print()
         
         
