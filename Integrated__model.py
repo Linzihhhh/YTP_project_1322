@@ -43,17 +43,18 @@ class IntegratedTools:
         ''' input user_score and data_path to train the liking_score model'''
         
         R=torch.load('Models/likingscore_predict_model.pt')
-        optim=torch.optim.Adam(R.parameters(),lr=0.01)
+        optim=torch.optim.Adam(R.parameters(),lr=0.001)
         loss_function=torch.nn.MSELoss()
         
         data=self.get_data(data_path, 45)
         
         optim.zero_grad()
         score=R(torch.FloatTensor(data).view(-1,18,20000))
-        loss=loss_function(score,torch.FloatTensor(user_score))
+        loss=loss_function(torch.FloatTensor(score),torch.FloatTensor([user_score]))
+        
         loss.backward()
         optim.step()
-        
+        optim.zero_grad()
         
         torch.save(R,'Models/likingscore_predict_model.pt')
         return print('Train_successfully')
@@ -127,7 +128,8 @@ class IntegratedTools:
             return score
             
 aa=IntegratedTools()
-aa.train_Liking_score_model(95, 'Local/Youtube/1.mp3')
+aa.train_Liking_score_model(100, 'Local/Youtube/1.mp3')
+print(aa.Get_Liking_score_with_path('Local/Youtube/1.mp3'))
         
         
        
