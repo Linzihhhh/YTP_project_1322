@@ -17,7 +17,7 @@ class IntegratedTools:
         x=x.data.numpy().squeeze()
         return x
     
-    def get_classes(self,a_score,v_score,multi_classes=True,use_algorithm=1):
+    def predict_classes(self,a_score,v_score,multi_classes=True,use_algorithm=1):
         
         if use_algorithm==1:
             '''use ANN for algorithm'''
@@ -76,7 +76,7 @@ class IntegratedTools:
         
         data=self.get_data(file_path, time_size)
         score=self.predict_score(data)
-        classes=self.get_classes(score[0,0],score[0,1])
+        classes=self.predict_classes(score[0,0],score[0,1])
         return self.get_top_n_classes(classes,n)
     
         '''Classes type
@@ -104,7 +104,7 @@ class IntegratedTools:
     def Get_Liking_score(self,data,data_type=0):
         '''data_type=0 raw_data, =1 AnalyzedAll_data, =2 CQT data'''
         if data_type==1:
-            
+            return
             
 aa=IntegratedTools()
 print(aa.get_class_with_path('Local/Youtube/1.mp3'))
