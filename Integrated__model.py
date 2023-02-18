@@ -39,8 +39,20 @@ class IntegratedTools:
     def train_classify_model(self,):
         return
     
-    def train_all_model(self):
-        return 
+    def train_Liking_score_model(self,user_score,data_path,data_type=0):
+        R=torch.load('Models/likingscore_predict_model.pt')
+        optim=torch.optim.Adam(R.parameters(),lr=0.01)
+        loss_function=torch.nn.MSELoss()
+        
+        data=self.get_data(data_path, 45)
+        
+        optim.zero_grad()
+        score=R(torch.FloatTensor(data).view(-1,18,20000))
+        loss=loss_function(score,torch.FloatTensor(user_score))
+        loss.backward()
+        optim.step()
+        torch.save(R,'Models/likingscore_predict_model.pt')
+        return True
     
     def predict_score(self,data,use_model=0):
         ''' 2=CQT with ANN, 1=MFCC+STFT with CNN 0= raw_data+RNN'''
@@ -105,14 +117,13 @@ class IntegratedTools:
         '''data_type=0 raw_data, =1 AnalyzedAll_data, =2 CQT data'''
         if data_type==0:
             data=self.get_data(data, 45)
-            Rnn=torch.load('Models/likingscore_predict_model.pt')
-            matrix=Rnn(torch.FloatTensor(data).view(-1,18,20000))
+            R=torch.load('Models/likingscore_predict_model.pt')
+            matrix=R(torch.FloatTensor(data).view(-1,18,20000))
             score=matrix.data.numpy()
             return score
             
 aa=IntegratedTools()
-print(aa.Get_Liking_score_with_path('Local/Youtube/1.mp3'))
-print()
+print(aa.train_Liking_score_model(100,'Local/Youtube/1.mp3' ))
         
         
        
