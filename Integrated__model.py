@@ -127,9 +127,13 @@ class IntegratedTools:
             score=matrix.data.numpy()
             return score
             
-aa=IntegratedTools()
-aa.train_Liking_score_model(100, 'Local/Youtube/1.mp3')
-print(aa.Get_Liking_score_with_path('Local/Youtube/1.mp3'))
+    def class_and_score(self,path,data_type=0):
+        
+        c=self.get_class_with_path(path)
+        score=self.Get_Liking_score_with_path(path)
+        return c,score
+    
+        
         
         
        
