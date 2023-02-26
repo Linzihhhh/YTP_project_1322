@@ -33,8 +33,6 @@ class PlayerBase:
         """
         await self._join(channel)
         voice_client: VoiceClient = channel.guild.voice_client
-        if voice_client.is_playing() or voice_client.is_paused():
-            return
         voice_client.play(source)
         
     async def _pause(self, guild: Guild):
