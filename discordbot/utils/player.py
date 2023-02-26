@@ -44,7 +44,7 @@ class PlayingSession(PlayerBase):
                 #     'options': f'-vn -ss {timestamp}',
                 #     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 10',
                 # }
-                await self.text_channel.send("success to play this song")
+                await self.text_channel.send(embed=self.queue[0].render())
                 await self.wait()
                 self.queue.delete_song(0)
         except Exception as e:
@@ -89,7 +89,7 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
     async def play(self, interaction: Interaction, qstring: str):
         if not await self._connectable_channel(interaction):
             return
-        # await self.join(interaction)
+        await self._join(interaction.user.voice.channel)
         await interaction.response.defer(thinking=True)
         await self._play(interaction.channel, qstring)
-        await interaction.edit_original_response(content="Succeed to play the music")
+        await interaction.edit_original_response(content="Succeed to add the music to queue")

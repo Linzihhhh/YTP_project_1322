@@ -118,10 +118,10 @@ class IntegratedTools:
         que.sort(reverse=True)
         return que
         
-    def Get_Liking_score_with_path(self,data,data_type=0):
+    def Get_Liking_score_with_path(self,path,data_type=0):
         '''data_type=0 raw_data, =1 AnalyzedAll_data, =2 CQT data'''
         if data_type==0:
-            data=self.get_data(data, 45)
+            data=self.get_data(path, 45)
             R=torch.load('Models/likingscore_predict_model.pt')
             matrix=R(torch.FloatTensor(data).view(-1,18,20000))
             score=matrix.data.numpy()

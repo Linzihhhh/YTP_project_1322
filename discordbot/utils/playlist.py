@@ -6,6 +6,9 @@ from urllib.parse import parse_qs
 
 from .downloader import YoutubeDownloader
 
+import discord
+from discord import Colour, Embed
+
 class Song:
 
     # __slots__ = (
@@ -56,6 +59,19 @@ class Song:
         parsed_url = urlparse(self._url)
         self._expire_time = float(parse_qs(parsed_url.query)['expire'][0])
 
+    def render(self) -> Embed:
+        embed = Embed(
+            title="Now playing",
+            description="The infomation is below",
+            colour=Colour.green(),
+            url=self.weburl
+        )
+        embed.add_field(
+            name="Title",
+            value=self.title,
+            inline=False
+        )
+        return embed
 
 class PlaylistBase:
 
