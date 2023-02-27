@@ -9,13 +9,13 @@ from discord import VoiceClient, VoiceChannel, StageChannel, VoiceState
 from discord import Guild
 
 from .playerbase import PlayerBase, PlayerBaseCog
-from .playlist import Song, PlaylistBase, Playlist
+from .playlist import Song, Playlist
 
 class PlayingSession(PlayerBase):
     def __init__(self, text_channel: discord.TextChannel):
         self.text_channel = text_channel
         self.guild = text_channel.guild
-        self.queue = PlaylistBase(self.guild.id)
+        self.queue = Playlist(self.guild.id)
         self.voice_client = self.guild.voice_client
         self.task = None
     
@@ -36,6 +36,8 @@ class PlayingSession(PlayerBase):
     async def run(self):
         try:
             while not self.queue.empty():
+                if self.queue[0].expired:
+                    await self.queue[0].get_full_info()
                 await self._play_source(self.voice_client.channel, 
                         discord.FFmpegPCMAudio(self.queue[0].url, **{
                             'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 10',
@@ -44,7 +46,7 @@ class PlayingSession(PlayerBase):
                 #     'options': f'-vn -ss {timestamp}',
                 #     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 10',
                 # }
-                await self.text_channel.send(embed=self.queue[0].render())
+                # await self.text_channel.send(embed=self.queue[0].render())
                 await self.wait()
                 self.queue.delete_song(0)
         except Exception as e:
@@ -59,7 +61,7 @@ class PlayingSession(PlayerBase):
             self.voice_client.stop()
 
     async def add_to_queue(self, url: str, idx: int = -1):
-        self.queue.add_songs(url)
+        await self.queue.add_songs(url)
 
 class Player(PlayerBase):
     def __init__(self):

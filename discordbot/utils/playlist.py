@@ -27,30 +27,24 @@ class Song:
 
     @property
     def title(self):
-        if self.expired:
-            self.get_full_info()
         return self._title
 
     @property
     def weburl(self):
-        if self.expired:
-            self.get_full_info()
         return self._weburl
 
     @property
     def url(self):
-        if self.expired:
-            self.get_full_info()
         return self._url
     
     def __init__(self, id):
         self.id = id
 
-    def get_full_info(self):
+    async def get_full_info(self):
         """
         Retrieve the full song info
         """
-        info = YoutubeDownloader.get_info(self.id)
+        info = await YoutubeDownloader.get_info(self.id)
         
         self._title = info["title"]
         self._url = info["url"]
@@ -73,7 +67,7 @@ class Song:
         )
         return embed
 
-class PlaylistBase:
+class Playlist:
 
     # __slots__ = tuple("playlist")
     
@@ -93,8 +87,8 @@ class PlaylistBase:
     def empty(self):
         return len(self.playlist) == 0
     
-    def add_songs(self, url: str):
-        ids = YoutubeDownloader.get_ids(url)
+    async def add_songs(self, url: str):
+        ids = await YoutubeDownloader.get_ids(url)
 
         for id in ids:
             self.playlist.append(Song(id))
@@ -102,15 +96,3 @@ class PlaylistBase:
     def delete_song(self, idx):
         self.playlist.pop(idx)
 
-
-class Playlist:
-    def __init__(self):
-        self._playlist: Dict[int, PlaylistBase] = dict()
-
-    def __getitem__(self, guild_id):
-        if self._playlist.get(guild_id) is None:
-            self._playlist[guild_id] = PlaylistBase(guild_id)
-        return self._playlist[guild_id]
-
-    def __setitem__(self, guild_id, value):
-        self._playlist[guild_id] = value
