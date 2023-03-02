@@ -1,9 +1,76 @@
 import torch
 import numpy as np
 from .AudioAnalyzer import AudioAnalyzer
-from .Models_module import mANN,ANN,RNN,Rnn
 from .batcher import batcher
 import os
+
+
+# import torch 
+import torch.nn as nn
+from torch.nn import functional as function
+
+#from AudioAnalyzer import AudioAnalyzer as AA
+
+class RNN(nn.Module):
+    def __init__(self):
+        super(RNN,self).__init__()
+        self.rnn=nn.LSTM(20000,1000,5,batch_first=True)
+        self.out=nn.Linear(1000,300)
+        self.net=nn.Sequential(
+            nn.Linear(300,50),
+            nn.LeakyReLU(),
+            nn.Linear(50,2)
+            )
+    def forward(self,x):
+        x=x.to(torch.float32)
+        r_out,(h_n,h_c)=self.rnn(x)
+        x=self.out(r_out[:,-1,:])
+        x=self.net(x)
+        return x
+
+class ANN(nn.Module):
+    def __init__(self):
+        super(ANN,self).__init__()
+        self.nn1=nn.Linear(2, 100)
+        self.nn2=nn.Linear(100,11)
+    def forward(self,x):
+        x=self.nn1(x)
+        x=nn.functional.relu(x)
+        x=self.nn2(x)
+        x=nn.functional.softmax(x)
+        
+        return x
+
+class mANN(nn.Module):
+    def __init__(self):
+        super(mANN,self).__init__()
+        self.nn1=nn.Linear(2, 100)
+        self.nn2=nn.Linear(100,11)
+    def forward(self,x):
+        x=self.nn1(x)
+        x=nn.functional.relu(x)
+        x=self.nn2(x)
+        x=nn.functional.softmax(x)
+        
+        return x
+
+class Rnn(nn.Module):
+    def __init__(self):
+        super(Rnn,self).__init__()
+        self.rnn=nn.LSTM(20000,1000,5,batch_first=True)
+        self.out=nn.Linear(1000,300)
+        self.net=nn.Sequential(
+            nn.Linear(300,200),
+            nn.LeakyReLU(),
+            nn.Linear(200,1)
+            )
+    def forward(self,x):
+        x=x.to(torch.float32)
+        r_out,(h_n,h_c)=self.rnn(x)
+        x=self.out(r_out[:,-1,:])
+        x=self.net(x)
+        return x
+
 
 
 class IntegratedTools:
@@ -11,7 +78,8 @@ class IntegratedTools:
         
         self.aa=AudioAnalyzer()
         self.batcher=batcher()
-        os.chdir(os.path.abspath(os.path.join(os.path.realpath(__file__),"../..")))
+        self.path = os.path.abspath(os.path.join(os.path.realpath(__file__),".."))
+        print(self.path)
         return
     
     def output(self,x):
@@ -23,7 +91,7 @@ class IntegratedTools:
         
         if use_algorithm==1:
             '''use ANN for algorithm'''
-            mann=torch.load('Models/multilabel_classifier.pt')
+            mann=torch.load(self.path+'/Models/multilabel_classifier.pt')
             matrix=np.matrix([[a_score,v_score]])
             matrix=mann(torch.from_numpy(matrix).float())
             
@@ -44,7 +112,7 @@ class IntegratedTools:
     def train_Liking_score_model(self,user_score,data_path,data_type=0):
         ''' input user_score and data_path to train the liking_score model'''
         
-        R=torch.load('Models/likingscore_predict_model.pt')
+        R=torch.load(f'{self.path}/Models/likingscore_predict_model.pt')
         optim=torch.optim.Adam(R.parameters(),lr=0.001)
         loss_function=torch.nn.MSELoss()
         
@@ -58,13 +126,13 @@ class IntegratedTools:
         optim.step()
         optim.zero_grad()
         
-        torch.save(R,'Models/likingscore_predict_model.pt')
+        torch.save(R,f'{self.path}/Models/likingscore_predict_model.pt')
         return print('Train_successfully')
     
     def predict_score(self,data,use_model=0):
         ''' 2=CQT with ANN, 1=MFCC+STFT with CNN 0= raw_data+RNN'''
         if use_model==0:
-            rnn=torch.load('Models/AVscore_predictor_rnn.pt')
+            rnn=torch.load(f'{self.path}/Models/AVscore_predictor_rnn.pt')
             matrix=rnn(torch.FloatTensor(data).view(-1,16,20000))
             matrix=matrix.data.numpy()
             return matrix
@@ -124,7 +192,7 @@ class IntegratedTools:
         '''data_type=0 raw_data, =1 AnalyzedAll_data, =2 CQT data'''
         if data_type==0:
             data=self.get_data(path, 40)
-            R=torch.load('Models/likingscore_predict_model.pt')
+            R=torch.load(self.path+'/Models/likingscore_predict_model.pt')
             matrix=R(torch.FloatTensor(data).view(-1,16,20000))
             score=matrix.data.numpy()
             return score
