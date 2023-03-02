@@ -6,6 +6,8 @@ from urllib.parse import parse_qs
 
 from .downloader import YoutubeDownloader
 
+from intergrated import intergrated_tools
+
 import discord
 from discord import Colour, Embed
 
@@ -96,3 +98,11 @@ class Playlist:
     def delete_song(self, idx):
         self.playlist.pop(idx)
 
+    async def sort(self):
+        scores = []
+
+        for song in self.playlist:
+            if song.expired:
+                await song.get_full_info()
+
+            intergrated_tools.class_and_score()

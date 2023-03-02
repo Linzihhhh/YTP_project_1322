@@ -1,8 +1,8 @@
 import torch
 import numpy as np
-from AudioAnalyzer import AudioAnalyzer
-from Models_module import mANN,ANN,RNN,Rnn
-from batcher import batcher
+from .AudioAnalyzer import AudioAnalyzer
+from .Models_module import mANN,ANN,RNN,Rnn
+from .batcher import batcher
 
 
 class IntegratedTools:
@@ -46,10 +46,10 @@ class IntegratedTools:
         optim=torch.optim.Adam(R.parameters(),lr=0.001)
         loss_function=torch.nn.MSELoss()
         
-        data=self.get_data(data_path, 45)
+        data=self.get_data(data_path, 40)
         
         optim.zero_grad()
-        score=R(torch.FloatTensor(data).view(-1,18,20000))
+        score=R(torch.FloatTensor(data).view(-1,16,20000))
         loss=loss_function(torch.FloatTensor(score),torch.FloatTensor([user_score]))
         
         loss.backward()
@@ -63,7 +63,7 @@ class IntegratedTools:
         ''' 2=CQT with ANN, 1=MFCC+STFT with CNN 0= raw_data+RNN'''
         if use_model==0:
             rnn=torch.load('Models/AVscore_predictor_rnn.pt')
-            matrix=rnn(torch.FloatTensor(data).view(-1,18,20000))
+            matrix=rnn(torch.FloatTensor(data).view(-1,16,20000))
             matrix=matrix.data.numpy()
             return matrix
         if use_model==1:
@@ -88,7 +88,7 @@ class IntegratedTools:
             data=self.aa.analyze_CQT(file_path, time_size)
             return data
         
-    def get_class_with_path(self,file_path,use_algorithm=0,time_size=45,n=3):
+    def get_class_with_path(self,file_path,use_algorithm=0,time_size=40,n=3):
         '''0 RNN, 1 MFCC CNN, 2 CQT MLP'''
         
         data=self.get_data(file_path, time_size)
@@ -121,9 +121,9 @@ class IntegratedTools:
     def Get_Liking_score_with_path(self,path,data_type=0):
         '''data_type=0 raw_data, =1 AnalyzedAll_data, =2 CQT data'''
         if data_type==0:
-            data=self.get_data(path, 45)
+            data=self.get_data(path, 40)
             R=torch.load('Models/likingscore_predict_model.pt')
-            matrix=R(torch.FloatTensor(data).view(-1,18,20000))
+            matrix=R(torch.FloatTensor(data).view(-1,16,20000))
             score=matrix.data.numpy()
             return score
             
@@ -132,18 +132,3 @@ class IntegratedTools:
         c=self.get_class_with_path(path)
         score=self.Get_Liking_score_with_path(path)
         return c,score
-    
-        
-        
-        
-       
-    
-    
-        
-    
-        
-            
-    
-
-        
-    

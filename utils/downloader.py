@@ -3,11 +3,12 @@ from typing import *
 import os
 import subprocess
 import asyncio
+import aiohttp
 
 class YoutubeDownloader:
 
     @classmethod
-    async def get_ids(self, url: str) -> list:
+    async def get_ids(cls, url: str) -> list:
         try:
             process = await asyncio.create_subprocess_shell(
                     f'yt-dlp --ignore-errors --get-id "{url}"', 
@@ -23,7 +24,7 @@ class YoutubeDownloader:
             print(e)
     
     @classmethod
-    async def get_info(self, id: str, *, path: str = None): 
+    async def get_info(cls, id: str, *, path: str = None): 
         """
         Download info of a song by given youtube video id
         """
@@ -38,7 +39,7 @@ class YoutubeDownloader:
             }
 
             process = await asyncio.create_subprocess_shell(
-                    f"yt-dlp --ignore-errors --get-url {weburl}", 
+                    f"yt-dlp -i -g {weburl}", 
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
             stdout, stderr = await process.communicate()
             if stderr:
@@ -50,7 +51,7 @@ class YoutubeDownloader:
             #     f"yt-dlp --ignore-errors --get-url {weburl}", capture_output=True).stdout.decode()
             
             process = await asyncio.create_subprocess_shell(
-                    f"yt-dlp --ignore-errors --get-title {weburl}", 
+                    f"yt-dlp -i -e {weburl}", 
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
             stdout, stderr = await process.communicate()
             if stderr:
@@ -65,3 +66,30 @@ class YoutubeDownloader:
         except Exception as e:
             print(e)
 
+    @classmethod
+    async def download(cls, id: str, path=None, **opts):
+        path = path or os.getcwd()
+
+        try:
+            weburl = f"https://www.youtube.com/watch?v={id}"
+            path = path or os.getcwd()
+
+            process = await asyncio.create_subprocess_shell(
+                    f"yt-dlp -i -g -f wa {weburl}", 
+                    stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+            stdout, stderr = await process.communicate()
+            if stderr:
+                raise Exception(stderr.decode())
+
+            url = stdout.decode().strip()
+
+            process = await asyncio.create_subprocess_shell(
+                    f"ffmpeg -ss 00:00:15.00 -i \"{url}\" -t 00:00:10.00 out.mp3", 
+                    stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+            stdout, stderr = await process.communicate()
+            if stderr:
+                raise Exception(stderr.decode())
+
+
+        except Exception as e:
+            print(e)
