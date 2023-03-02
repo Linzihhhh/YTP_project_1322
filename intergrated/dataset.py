@@ -1,5 +1,5 @@
 from ytdl import YoutubeMusicDownloader
-from AudioAnalyzer import AudioAnalyzer
+from .AudioAnalyzer import AudioAnalyzer
 import os, time, json
 import numpy as np
 

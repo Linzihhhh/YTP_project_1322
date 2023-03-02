@@ -10,6 +10,8 @@ TOKEN = os.getenv("TOKEN")
 from utils.playerbase import PlayerBaseCog
 from utils.player import PlayerCog
 
+from intergrated import *
+
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="><>", intents=intents)
 

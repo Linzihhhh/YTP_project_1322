@@ -63,6 +63,9 @@ class PlayingSession(PlayerBase):
     async def add_to_queue(self, url: str, idx: int = -1):
         await self.queue.add_songs(url)
 
+    async def _sort(self):
+        await self.queue.sort()
+
 class Player(PlayerBase):
     def __init__(self):
         # self.playlist: Mapping[int, Playlist] = dict()
@@ -82,6 +85,8 @@ class Player(PlayerBase):
         if not self.playing_session[guild_id].running():
             await self.playing_session[guild_id].start_session()
 
+    async def _sort(self, guild: discord.Guild):
+        await self.playing_session[guild.id]._sort()
 
 class PlayerCog(Player, PlayerBaseCog, commands.Cog):
     def __init__(self):
@@ -95,3 +100,9 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
         await interaction.response.defer(thinking=True)
         await self._play(interaction.channel, qstring)
         await interaction.edit_original_response(content="Succeed to add the music to queue")
+
+    @app_commands.command(name="sort", description="sort the songs according to the given condition")
+    async def sort(self, interaction: Interaction):
+        await interaction.response.defer(thinking=True)
+        await self._sort(interaction.guild)
+        await interaction.edit_original_response(content="sorted")

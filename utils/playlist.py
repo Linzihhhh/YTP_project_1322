@@ -4,9 +4,12 @@ import time
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
+import functools
+
 from .downloader import YoutubeDownloader
 
-from intergrated import intergrated_tools
+# from intergrated import intergrated_tools
+from intergrated import *
 
 import discord
 from discord import Colour, Embed
@@ -86,7 +89,7 @@ class Playlist:
     def dump(self):
         pass
 
-    def empty(self):
+    def empty(self) -> bool:
         return len(self.playlist) == 0
     
     async def add_songs(self, url: str):
@@ -99,10 +102,17 @@ class Playlist:
         self.playlist.pop(idx)
 
     async def sort(self):
-        scores = []
+        scores = dict()
 
         for song in self.playlist:
-            if song.expired:
-                await song.get_full_info()
+            await YoutubeDownloader.download(song.id, path="Songs")
 
-            intergrated_tools.class_and_score()
+            scores[song.id] = intergrated_tools.class_and_score(f"Songs/{song.id}.mp3")
+
+        def key(x, y):
+            xx = scores[x], yy = scores[y]
+            if xx[0][0][0] != yy[0][0][0]:
+                return xx[0][0][0] < yy[0][0][0]
+            return xx[1] < yy[1]
+
+        self.playlist[1:] = sorted(self.playlist[1:], key=functools.cmp_to_key(key))
