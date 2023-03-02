@@ -3,6 +3,7 @@ import numpy as np
 from .AudioAnalyzer import AudioAnalyzer
 from .Models_module import mANN,ANN,RNN,Rnn
 from .batcher import batcher
+import os
 
 
 class IntegratedTools:
@@ -10,6 +11,7 @@ class IntegratedTools:
         
         self.aa=AudioAnalyzer()
         self.batcher=batcher()
+        os.chdir(os.path.abspath(os.path.join(os.path.realpath(__file__),"../..")))
         return
     
     def output(self,x):
