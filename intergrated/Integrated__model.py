@@ -106,8 +106,22 @@ class IntegratedTools:
             '''unfinished'''
             return
         
-    def train_classify_model(self,):
-        return
+    def train_AVscore_model(self,data_path,user_arousal,user_valence,data_type=0):
+        
+        R=torch.load(f'{self.path}/Models/AVscore_predictor_rnn.pt')
+        optim=torch.optim.Adam(R.parameters(),lr=0.01)
+        loss_function=torch.nn.MSELoss()
+        
+        data=self.get_data(data_path,40)
+        
+        score=R(torch.FLoatTensor(data).view(-1,16,20000))
+        loss=loss_function(torch.FloatTensor(score),torch.FloatTensor([user_arousal,user_valence]))
+        
+        loss.backward()
+        optim.step()
+        
+        optim.zero_grad()
+        return print('Train_successfully')
     
     def train_Liking_score_model(self,user_score,data_path,data_type=0):
         ''' input user_score and data_path to train the liking_score model'''
