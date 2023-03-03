@@ -58,10 +58,8 @@ class PlayerBaseCog(PlayerBase, commands.Cog):
     
 
     async def _connectable_channel(self, interaction: Interaction) -> bool:
-        if not isinstance(interaction.user.voice, discord.VoiceState):
-            return False
         if not isinstance(interaction.user.voice.channel, discord.channel.VocalGuildChannel):
-            # await interaction.response.send_message("Please enter a voice channel first", ephemeral=True)
+            await interaction.response.send_message("Please enter a voice channel first", ephemeral=True)
             return False
         return True
     
@@ -83,8 +81,8 @@ class PlayerBaseCog(PlayerBase, commands.Cog):
 
     @app_commands.command(name="join", description="加入使用者所在頻道")
     async def join(self, interaction: Interaction):
-        if not await self._connectable_channel(interaction):
-            await self.sent_embed(interaction,0xde1f1f,"無法加入語音頻道!")
+        if interaction.user.voice is None:
+            await self.sent_embed(interaction,0xde1f1f,"無法找到語音頻道!")
             return
         await self._join(interaction.user.voice.channel)
         await self.sent_embed(interaction,0x23fa4a,f"已加入{interaction.user.voice.channel.name}")
@@ -127,7 +125,7 @@ class PlayerBaseCog(PlayerBase, commands.Cog):
         await self.sent_embed(interaction,0x23fa4a,f"音樂已繼續播放!")
 
 
-    @app_commands.command(name="skip", description="Skip the current playing audio")
+    @app_commands.command(name="skip", description="跳過音樂")
     async def skip(self, interaction: Interaction):
         voice_client: VoiceClient = interaction.guild.voice_client
         if voice_client is None:

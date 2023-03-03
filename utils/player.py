@@ -2,6 +2,8 @@ from typing import *
 
 import asyncio
 
+from datetime import datetime
+
 import discord
 from discord.ext import commands
 from discord import app_commands, Interaction
@@ -92,17 +94,31 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
     def __init__(self):
         super().__init__()
 
-    @app_commands.command(name="play", description="Play the song or playlist you want")
-    async def play(self, interaction: Interaction, qstring: str):
-        if not await self._connectable_channel(interaction):
+    @app_commands.command(name="play", description="撥放音樂或清單")
+    async def play(self, interaction: Interaction, url: str):
+        if interaction.user.voice is None:
+            await self.sent_embed(interaction,0xde1f1f,"無法找到語音頻道!")
             return
         await self._join(interaction.user.voice.channel)
-        await interaction.response.defer(thinking=True)
-        await self._play(interaction.channel, qstring)
-        await interaction.edit_original_response(content="Succeed to add the music to queue")
-
-    @app_commands.command(name="sort", description="sort the songs according to the given condition")
+        await interaction.response.defer(thinking=True, ephemeral=True)
+        await self._play(interaction.channel, url)
+        
+        await interaction.edit_original_response(content=url)
+        embed = discord.Embed(
+            title="已加入一首音樂!",
+            color=0x23fa4a,
+            timestamp=datetime.now(),
+            url = url
+        )
+        await interaction.channel.send(embed=embed)
+    
+    @app_commands.command(name="sort", description="將現有清單最佳化排序")
     async def sort(self, interaction: Interaction):
         await interaction.response.defer(thinking=True)
         await self._sort(interaction.guild)
-        await interaction.edit_original_response(content="sorted")
+        embed = discord.Embed(
+            title="已排序完成!",
+            color=0x23fa4a,
+            timestamp=datetime.now(),
+        )
+        await interaction.edit_original_response(embed=embed)
