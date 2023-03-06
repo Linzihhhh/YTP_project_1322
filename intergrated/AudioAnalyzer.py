@@ -30,18 +30,14 @@ class AudioAnalyzer:
         return CQT #numpy
 
     def analyze_ALL(self, Audio, time_size):
-        y, sr = librosa.load(Audio)
-        STFT = librosa.stft(y)
-        STFT = self.Resize(STFT, time_size)
-    
+        
         MFCC = librosa.feature.mfcc(y = y,sr = sr)
         MFCC = self.Resize(MFCC, time_size)
     
         CQT = librosa.feature.chroma_cqt(y = y,sr = sr)
         CQT = self.Resize(CQT, time_size)
         
-        totaldata = np.vstack([STFT, MFCC])
-        totaldata = np.vstack([totaldata, CQT])
+        totaldata = np.vstack([MFCC, CQT])
         return totaldata #numpy
     
     def save(self, data, path):

@@ -71,6 +71,30 @@ class Rnn(nn.Module):
         x=self.net(x)
         return x
 
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN,self).__init__()
+        self.conv1=nn.Sequential(
+            nn.Conv2d(1,10,3,1,1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)
+            )
+        self.conv2=nn.Sequential(
+            nn.Conv2d(10,15,3,1,1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)
+            )
+        self.linear=nn.Linear(600000,300)
+        self.linear2=nn.Linear(300,2)
+    def forward(self,x):
+        x=x.to(torch.float32)
+        x=self.conv1(x)
+        x=self.conv2(x)
+        x=x.view(-1,15*8*5000)
+        x=self.linear(x)
+        x=self.linear2(x)
+        return x
+
 
 
 class IntegratedTools:
@@ -151,12 +175,16 @@ class IntegratedTools:
             matrix=matrix.data.numpy()
             return matrix
         if use_model==1:
+            cnn=torch.load(f'self.path/Models/AVscore_predictor_cnn.pt')
+            matrix=cnn(torch.from_numpy(data).view(1,1,32,20000))
+            matrix=matrix.data.numpy()
+            return matrix
             '''not finished'''
     
     def get_data(self,file_path,time_size,datatype=0):
         '''datatype 0=Raw data 1= Analyzed_ALL data, 2=CQT data'''
         '''please enter time_size with second'''
-        if datatype==1:
+        if datatype==2:
             data=self.aa.analyze_ALL(file_path, time_size)
             return data
         
@@ -167,16 +195,16 @@ class IntegratedTools:
             data=data[:sr*time_size]
             return data
         
-        if datatype==2:
-            
-            data=self.aa.analyze_CQT(file_path, time_size)
+        if datatype==1:
+            time_size=20000
+            data=self.aa.analyze_ALL(file_path, time_size)
             return data
         
     def get_class_with_path(self,file_path,use_algorithm=0,time_size=40,n=3):
         '''0 RNN, 1 MFCC CNN, 2 CQT MLP'''
         
-        data=self.get_data(file_path, time_size)
-        score=self.predict_score(data)
+        data=self.get_data(file_path, time_size,use_algorithm)
+        score=self.predict_score(data,use_algorithm)
         classes=self.predict_classes(score[0,0],score[0,1])
         return self.get_top_n_classes(classes,n)
     
@@ -213,6 +241,6 @@ class IntegratedTools:
             
     def class_and_score(self,path,data_type=0):
         
-        c=self.get_class_with_path(path)
-        score=self.Get_Liking_score_with_path(path)
+        c=self.get_class_with_path(path,data_type)
+        score=self.Get_Liking_score_with_path(path,data_type)
         return c,score
