@@ -103,7 +103,6 @@ class IntegratedTools:
         self.aa=AudioAnalyzer()
         self.batcher=batcher()
         self.path = os.path.abspath(os.path.join(os.path.realpath(__file__),".."))
-        print(self.path)
         return
     
     def output(self,x):
