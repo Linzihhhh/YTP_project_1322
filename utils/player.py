@@ -48,7 +48,7 @@ class PlayingSession(PlayerBase):
                 #     'options': f'-vn -ss {timestamp}',
                 #     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 10',
                 # }
-                # await self.text_channel.send(embed=self.queue[0].render())
+                # await self.text_channel.send(embed=await self.queue[0].render())
                 await self.wait()
                 self.queue.delete_song(0)
         except Exception as e:
@@ -122,3 +122,29 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
             timestamp=datetime.now(),
         )
         await interaction.edit_original_response(embed=embed)
+
+    @app_commands.command(name="song", description="hello")
+    async def song_info(self, interaction: Interaction, idx: int):
+        if not self.playing_session[interaction.guild.id].running():
+            return
+        if idx >= len(self.playing_session[interaction.guild.id].queue):
+            return
+        
+        embed = await self.playing_session[interaction.guild.id].queue[idx].render()
+        await interaction.response.send_message(embed=embed)
+    
+    @app_commands.command(name="nowplaying", description="hello")
+    async def nowplaying(self, interaction: Interaction):
+        if not self.playing_session[interaction.guild.id].running():
+            return
+        
+        embed = await self.playing_session[interaction.guild.id].queue.nowplaying.render()
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="queue", description="hello")
+    async def queue_info(self, interaction: Interaction):
+        if not self.playing_session[interaction.guild.id].running():
+            return
+        
+        embed = await self.playing_session[interaction.guild.id].queue.render()
+        await interaction.response.send_message(embed=embed)

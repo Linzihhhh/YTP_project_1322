@@ -30,7 +30,7 @@ class AudioAnalyzer:
         return CQT #numpy
 
     def analyze_ALL(self, Audio, time_size):
-        
+        y,sr=librosa.load(Audio)
         MFCC = librosa.feature.mfcc(y = y,sr = sr)
         MFCC = self.Resize(MFCC, time_size)
     

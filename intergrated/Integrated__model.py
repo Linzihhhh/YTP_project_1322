@@ -174,7 +174,7 @@ class IntegratedTools:
             matrix=matrix.data.numpy()
             return matrix
         if use_model==1:
-            cnn=torch.load(f'self.path/Models/AVscore_predictor_cnn.pt')
+            cnn=torch.load(f'{self.path}/Models/AVscore_predictor_cnn.pt')
             matrix=cnn(torch.from_numpy(data).view(1,1,32,20000))
             matrix=matrix.data.numpy()
             return matrix
@@ -238,8 +238,8 @@ class IntegratedTools:
             score=matrix.data.numpy()
             return score
             
-    def class_and_score(self,path,data_type=0):
+    def class_and_score(self,path,data_type=1):
         
-        c=self.get_class_with_path(path,data_type)
-        score=self.Get_Liking_score_with_path(path,data_type)
+        c=self.get_class_with_path(path,use_algorithm=data_type)
+        score=self.Get_Liking_score_with_path(path,data_type=0)[0][0]
         return c,score

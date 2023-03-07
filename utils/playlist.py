@@ -42,6 +42,18 @@ class Song:
     def url(self):
         return self._url
     
+    @property
+    def duration(self):
+        return self._duration
+    
+    @property
+    def uploader(self):
+        return self._uploader
+    
+    @property
+    def channel_url(self):
+        return self._channel_url
+    
     def __init__(self, id):
         self.id = id
 
@@ -52,13 +64,20 @@ class Song:
         info = await YoutubeDownloader.get_info(self.id)
         
         self._title = info["title"]
-        self._url = info["url"]
-        self._weburl = info["weburl"]
-        
+        self._url = info["requested_formats"][-1]["url"]
+        self._weburl = info["webpage_url"]
+        self._duration = info["duration"]
+        self._thumbnail = info["thumbnail"]
+        self._uploader = info["uploader"]
+        self._channel_url = info["channel_url"]
+
         parsed_url = urlparse(self._url)
         self._expire_time = float(parse_qs(parsed_url.query)['expire'][0])
 
-    def render(self) -> Embed:
+    async def render(self) -> Embed:
+        if self.expired:
+            await self.get_full_info()
+        
         embed = Embed(
             title="Now playing",
             description="The infomation is below",
@@ -92,6 +111,19 @@ class Playlist:
     def empty(self) -> bool:
         return len(self.playlist) == 0
     
+    @property
+    def nowplaying(self) -> Optional[Song]:
+        if not self.empty():
+            return self.playlist[0]
+        return None
+
+    async def render(self) -> Embed:
+        for song in self.playlist[1:]:
+            if song.expired:
+                await song.get_full_info()
+
+            # do something
+    
     async def add_songs(self, url: str):
         ids = await YoutubeDownloader.get_ids(url)
 
@@ -109,10 +141,11 @@ class Playlist:
 
             scores[song.id] = intergrated_tools.class_and_score(f"Songs/{song.id}.mp3")
 
-        def key(x, y):
-            xx = scores[x], yy = scores[y]
-            if xx[0][0][0] != yy[0][0][0]:
-                return xx[0][0][0] < yy[0][0][0]
+        def key(x: Song, y: Song) -> bool:
+            xx = scores[x.id]
+            yy = scores[y.id]
+            if xx[0][0][1] != yy[0][0][1]:
+                return xx[0][0][1] < yy[0][0][1]
             return xx[1] < yy[1]
 
         self.playlist[1:] = sorted(self.playlist[1:], key=functools.cmp_to_key(key))

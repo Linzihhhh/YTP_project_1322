@@ -4,6 +4,7 @@ import os
 import subprocess
 import asyncio
 import aiohttp
+import json
 
 class YoutubeDownloader:
 
@@ -33,36 +34,17 @@ class YoutubeDownloader:
             weburl = f"https://www.youtube.com/watch?v={id}"
             path = path or os.getcwd()
 
-            info = {
-                "id": id,
-                "weburl": weburl,
-            }
-
             process = await asyncio.create_subprocess_shell(
-                    f"yt-dlp -i -g {weburl}", 
+                    f"yt-dlp -i -j {weburl}", 
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
             stdout, stderr = await process.communicate()
             if stderr:
                 raise Exception(stderr.decode())
 
-            info["url"] = stdout.decode().split('\n')[1]
+            raw_info = dict(json.loads(stdout.decode()))
 
-            # info["url"] = subprocess.run(
-            #     f"yt-dlp --ignore-errors --get-url {weburl}", capture_output=True).stdout.decode()
-            
-            process = await asyncio.create_subprocess_shell(
-                    f"yt-dlp -i -e {weburl}", 
-                    stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-            stdout, stderr = await process.communicate()
-            if stderr:
-                raise Exception(stderr.decode())
-
-            # info["title"] = subprocess.run(
-            #     f"yt-dlp --ignore-errors --get-title {weburl}", capture_output=True).stdout.decode()
-            
-            info["title"] = stdout.decode()
-
-            return info
+            return raw_info
+        
         except Exception as e:
             print(e)
 
