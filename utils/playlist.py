@@ -144,8 +144,16 @@ class Playlist:
         def key(x: Song, y: Song) -> bool:
             xx = scores[x.id]
             yy = scores[y.id]
-            if xx[0][0][1] != yy[0][0][1]:
-                return xx[0][0][1] < yy[0][0][1]
-            return xx[1] < yy[1]
+            if xx[0][0][1] < yy[0][0][1]:
+                return -1
+            elif xx[0][0][1] > yy[0][0][1]:
+                return 1
+            else:
+                if xx[1] < yy[1]:
+                    return -1
+                elif xx[1] > yy[1]:
+                    return 1
+                else:
+                    return 0
 
         self.playlist[1:] = sorted(self.playlist[1:], key=functools.cmp_to_key(key))
