@@ -123,28 +123,31 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
         )
         await interaction.edit_original_response(embed=embed)
 
-    @app_commands.command(name="song", description="hello")
+    @app_commands.command(name="song", description="顯示第idx首歌曲")
     async def song_info(self, interaction: Interaction, idx: int):
         if not self.playing_session[interaction.guild.id].running():
+            await self.sent_embed(interaction,0xde1f1f,"未播放音樂!")
             return
-        if idx >= len(self.playing_session[interaction.guild.id].queue):
+        if idx >= len(self.playing_session[interaction.guild.id].queue.playlist):
+            await self.sent_embed(interaction,0xde1f1f,"沒有那麼多歌曲!")
             return
         
         embed = await self.playing_session[interaction.guild.id].queue[idx].render()
         await interaction.response.send_message(embed=embed)
     
-    @app_commands.command(name="nowplaying", description="hello")
+    @app_commands.command(name="nowplaying", description="顯示當前歌曲")
     async def nowplaying(self, interaction: Interaction):
         if not self.playing_session[interaction.guild.id].running():
             return
         
         embed = await self.playing_session[interaction.guild.id].queue.nowplaying.render()
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @app_commands.command(name="queue", description="hello")
+    @app_commands.command(name="list", description="顯示待播清單")
     async def queue_info(self, interaction: Interaction):
         if not self.playing_session[interaction.guild.id].running():
             return
         
+        await interaction.response.defer(thinking=True)
         embed = await self.playing_session[interaction.guild.id].queue.render()
-        await interaction.response.send_message(embed=embed)
+        await interaction.edit_original_response(embed=embed)

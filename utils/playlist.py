@@ -54,6 +54,10 @@ class Song:
     def channel_url(self):
         return self._channel_url
     
+    @property
+    def thumbnail(self):
+        return self._thumbnail
+    
     def __init__(self, id):
         self.id = id
 
@@ -79,16 +83,12 @@ class Song:
             await self.get_full_info()
         
         embed = Embed(
-            title="Now playing",
-            description="The infomation is below",
+            title= self.title,
+            url = self.weburl,
             colour=Colour.green(),
-            url=self.weburl
+            description=f"[{self.uploader}]({self.channel_url})"
         )
-        embed.add_field(
-            name="Title",
-            value=self.title,
-            inline=False
-        )
+        embed.set_image(url=self.thumbnail)
         return embed
 
 class Playlist:
@@ -118,12 +118,48 @@ class Playlist:
         return None
 
     async def render(self) -> Embed:
-        for song in self.playlist[1:]:
-            if song.expired:
-                await song.get_full_info()
+        if len(self.playlist) < 2:
+            embed = Embed(
+                title="待播清單",
+                color = Colour.green(),
+                description="無待播音樂"
+            )
+            return embed
+        elif len(self.playlist) < 9:
+            embed = Embed(
+                title="待播清單",
+                color = Colour.green()
+            )
+            for i, song in enumerate(self.playlist[1:], 1):
+                if song.expired:
+                    await song.get_full_info()
+                
+                embed.add_field(
+                    name="",
+                    value=f"{i}. "+f"[{song.title}]({song.weburl})",
+                    inline=False
+                )
+            return embed
+        else:
+            embed = Embed(
+                title="待播清單",
+                color = Colour.green()
+            )
+            for i, song in enumerate(self.playlist[1:8], 1):
+                if song.expired:
+                    await song.get_full_info()
+                
+                embed.add_field(
+                    name="",
+                    value=f"{i}. "+f"[{song.title}]({song.weburl})",
+                    inline=False
+                )
+            embed.add_field(
+                name="",
+                value="..."
+            )
+            return embed
 
-            # do something
-    
     async def add_songs(self, url: str):
         ids = await YoutubeDownloader.get_ids(url)
 

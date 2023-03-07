@@ -136,3 +136,4 @@ class PlayerBaseCog(PlayerBase, commands.Cog):
             await self.sent_embed(interaction,0x23fa4a,f"已跳過音樂!")
             return
         await self.sent_embed(interaction,0xde1f1f,"無播放中音樂!")
+
