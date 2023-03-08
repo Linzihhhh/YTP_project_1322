@@ -76,7 +76,7 @@ class PlayerBaseCog(PlayerBase, commands.Cog):
         voice_client: VoiceClient = member.guild.voice_client
         if voice_client is None:
             return
-        if len(voice_client.channel.members) == 0:
+        if len(voice_client.channel.members) == 1:
             self._pause()
 
     @app_commands.command(name="join", description="加入使用者所在頻道")

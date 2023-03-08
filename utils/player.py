@@ -35,6 +35,10 @@ class PlayingSession(PlayerBase):
         loop = asyncio.get_event_loop()
         self.task = loop.create_task(self.run())
 
+    async def stop(self):
+        self.queue.playlist.clear()
+        self.task.cancel()
+
     async def run(self):
         try:
             while not self.queue.empty():
@@ -87,12 +91,22 @@ class Player(PlayerBase):
         if not self.playing_session[guild_id].running():
             await self.playing_session[guild_id].start_session()
 
+    async def _stop(self, guild: discord.Guild):
+        if self.playing_session.get(guild.id) is None:
+            return
+        await self.playing_session[guild.id].stop()
+
     async def _sort(self, guild: discord.Guild):
         await self.playing_session[guild.id]._sort()
 
 class PlayerCog(Player, PlayerBaseCog, commands.Cog):
     def __init__(self):
         super().__init__()
+
+    @commands.Cog.listener(name="on_voice_state_update")
+    async def on_leave(self, member: discord.Member, before: VoiceState, after: VoiceState):
+        if member == member.guild.me:
+            await self._stop(member.guild)
 
     @app_commands.command(name="play", description="撥放音樂或清單")
     async def play(self, interaction: Interaction, url: str):
