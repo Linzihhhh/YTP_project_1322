@@ -65,8 +65,8 @@ class YoutubeDownloader:
 
             url = stdout.decode().strip()
 
-            ss = opts.get("ss") or "00:00:00.00"
-            t = opts.get("t") or "00:00:45.00"
+            ss = opts.get("ss") or "00:01:00.00"
+            t = opts.get("t") or "00:00:20.00"
 
             process = await asyncio.create_subprocess_shell(
                     f"ffmpeg -ss {ss} -i \"{url}\" -t {t} -n {path}/{id}.mp3", 

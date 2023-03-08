@@ -148,6 +148,6 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
         if not self.playing_session[interaction.guild.id].running():
             return
         
-        await interaction.response.defer(thinking=True)
+        await interaction.response.defer(thinking=True, ephemeral=True)
         embed = await self.playing_session[interaction.guild.id].queue.render()
         await interaction.edit_original_response(embed=embed)
