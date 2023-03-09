@@ -14,9 +14,8 @@ from .playerbase import PlayerBase, PlayerBaseCog
 from .playlist import Song, Playlist
 
 class PlayingSession(PlayerBase):
-    def __init__(self, text_channel: discord.TextChannel):
-        self.text_channel = text_channel
-        self.guild = text_channel.guild
+    def __init__(self, guild: Guild):
+        self.guild = guild
         self.queue = Playlist(self.guild.id)
         self.voice_client = self.guild.voice_client
         self.task = None
@@ -52,7 +51,6 @@ class PlayingSession(PlayerBase):
                 #     'options': f'-vn -ss {timestamp}',
                 #     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 10',
                 # }
-                # await self.text_channel.send(embed=await self.queue[0].render())
                 await self.wait()
                 self.queue.delete_song(0)
         except Exception as e:
@@ -74,22 +72,19 @@ class PlayingSession(PlayerBase):
 
 class Player(PlayerBase):
     def __init__(self):
-        # self.playlist: Mapping[int, Playlist] = dict()
-        # self.playlist = Playlist()
         self.playing_session: Mapping[int, PlayingSession] = dict()
 
     def ensure_session_exist(self):
         pass
 
-    async def _play(self, text_channel: discord.TextChannel, url: str):
-        guild_id = text_channel.guild.id
-        if self.playing_session.get(guild_id) is None:
-            self.playing_session[guild_id] = PlayingSession(text_channel)
+    async def _play(self, guild: Guild, url: str):
+        if self.playing_session.get(guild.id) is None:
+            self.playing_session[guild.id] = PlayingSession(guild)
         
-        await self.playing_session[guild_id].add_to_queue(url)
+        await self.playing_session[guild.id].add_to_queue(url)
 
-        if not self.playing_session[guild_id].running():
-            await self.playing_session[guild_id].start_session()
+        if not self.playing_session[guild.id].running():
+            await self.playing_session[guild.id].start_session()
 
     async def _stop(self, guild: discord.Guild):
         if self.playing_session.get(guild.id) is None:
@@ -115,7 +110,7 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
             return
         await self._join(interaction.user.voice.channel)
         await interaction.response.defer(thinking=True, ephemeral=True)
-        await self._play(interaction.channel, url)
+        await self._play(interaction.guild, url)
         
         await interaction.edit_original_response(content=url)
         embed = discord.Embed(
