@@ -114,7 +114,7 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
         
         await interaction.edit_original_response(content=url)
         embed = discord.Embed(
-            title="已加入一首音樂!",
+            title="已成功加入音樂!",
             color=0x23fa4a,
             timestamp=datetime.now(),
             url = url
