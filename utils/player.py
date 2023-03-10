@@ -12,6 +12,7 @@ from discord import Guild
 
 from .playerbase import PlayerBase, PlayerBaseCog
 from .playlist import Song, Playlist
+from .type import EmotionType
 
 class PlayingSession(PlayerBase):
     def __init__(self, guild: Guild):
@@ -70,6 +71,9 @@ class PlayingSession(PlayerBase):
     async def _sort(self):
         await self.queue.sort()
 
+    async def _keep(self, *emotion):
+        await self.queue.keep(*emotion)
+
 class Player(PlayerBase):
     def __init__(self):
         self.playing_session: Mapping[int, PlayingSession] = dict()
@@ -92,7 +96,14 @@ class Player(PlayerBase):
         await self.playing_session[guild.id].stop()
 
     async def _sort(self, guild: discord.Guild):
+        if self.playing_session.get(guild.id) is None:
+            return
         await self.playing_session[guild.id]._sort()
+
+    async def _keep(self, guild: discord.Guild, *emotions):
+        if self.playing_session.get(guild.id) is None:
+            return
+        await self.playing_session[guild.id]._keep(*emotions)
 
 class PlayerCog(Player, PlayerBaseCog, commands.Cog):
     def __init__(self):
@@ -131,6 +142,27 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
             timestamp=datetime.now(),
         )
         await interaction.edit_original_response(embed=embed)
+
+    @app_commands.command(name="filter", description="Only keep songs which have some emotions")
+    async def keep(self, interaction: Interaction):
+
+        options = list(map(lambda emotion: discord.SelectOption(label=str(emotion).capitalize()), EmotionType))
+
+        class View(discord.ui.View):
+            def __init__(self, func: Callable[[Guild, List[EmotionType]], None], *, timeout=180):
+                super().__init__(timeout=timeout)
+                self.func = func
+
+            @discord.ui.select(cls=discord.ui.Select, placeholder="Choose some types of emotion", options=options)
+            async def select_emotion(self, interaction: Interaction, select: discord.ui.Select):
+                await interaction.message.edit(content="Selected: {}".format(", ".join(select.values)), view=None)
+                await interaction.response.defer(thinking=True, ephemeral=True)
+                await self.func(interaction.guild, *map(lambda emotion: EmotionType[emotion.upper()], select.values))
+                await interaction.edit_original_response(content="success")
+
+        view = View(self._keep)
+        
+        await interaction.response.send_message(view=view)
 
     @app_commands.command(name="song", description="顯示第idx首歌曲")
     async def song_info(self, interaction: Interaction, idx: int):

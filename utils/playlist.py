@@ -1,12 +1,14 @@
 from typing import *
 
 import time
+import asyncio
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
 import functools
 
 from .downloader import YoutubeDownloader
+from .type import EmotionType
 
 # from intergrated import intergrated_tools
 from intergrated import *
@@ -173,9 +175,22 @@ class Playlist:
         scores = dict()
 
         for song in self.playlist:
+            if scores.get(song.id) is not None:
+                continue
+
             await YoutubeDownloader.download(song.id, path="Songs")
 
-            scores[song.id] = intergrated_tools.class_and_score(f"Songs/{song.id}.mp3")
+            classes = [0, 0, 1, 2, 2, 2, 5, 0, 3, 4, 6]
+            raw_result = intergrated_tools.class_and_score(f"Songs/{song.id}.mp3")
+            
+            result = (list(), raw_result[1])
+            count = [0] * 7
+            for catagory in raw_result[0]:
+                count[classes[catagory[1] - 1]] += catagory[0]
+            for i, val in enumerate(count):
+                result[0].append((val, i))
+            result[0].sort(reverse=True)
+            scores[song.id] = result
 
         def key(x: Song, y: Song) -> bool:
             xx = scores[x.id]
@@ -185,11 +200,51 @@ class Playlist:
             elif xx[0][0][1] > yy[0][0][1]:
                 return 1
             else:
-                if xx[1] < yy[1]:
+                if xx[1] > yy[1]:
                     return -1
-                elif xx[1] > yy[1]:
+                elif xx[1] < yy[1]:
                     return 1
                 else:
                     return 0
 
         self.playlist[1:] = sorted(self.playlist[1:], key=functools.cmp_to_key(key))
+
+    async def keep(self, *emotions: EmotionType):
+
+        scores: Dict[str, int] = dict()
+        playlist = []
+        
+        for song in self.playlist[1:]:
+
+            await YoutubeDownloader.download(song.id, path="Songs")
+            await asyncio.sleep(1.0)
+
+            raw_result = intergrated_tools.class_and_score(f"Songs/{song.id}.mp3")
+
+            count = [0] * 7
+            for catagory in raw_result[0]:
+                count[EmotionType.from_classes(catagory[1])] += catagory[0]
+
+            result = []
+            for i, val in enumerate(count):
+                result.append((val, i))
+
+            result.sort(reverse=True)
+            if EmotionType(result[0][1]) in emotions:
+                playlist.append(song)
+                scores[song.id] = raw_result[1]
+
+        def key(x: Song, y: Song) -> bool:
+            xx = scores[x.id]
+            yy = scores[y.id]
+            if xx > yy:
+                return -1
+            elif xx < yy:
+                return 1
+            else:
+                return 0
+
+        playlist.sort(key=functools.cmp_to_key(key))
+        self.playlist[1:] = playlist
+
+    
