@@ -146,22 +146,31 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
     @app_commands.command(name="filter", description="保留與要求情緒相符的歌曲")
     async def keep(self, interaction: Interaction):
 
-        options = list(map(lambda emotion: discord.SelectOption(label=str(emotion).capitalize()), EmotionType))
+        options = list(map(lambda emotion: 
+                           discord.SelectOption(label=str(emotion).capitalize()), EmotionType))
 
         class View(discord.ui.View):
             def __init__(self, func: Callable[[Guild, List[EmotionType]], None], *, timeout=180):
                 super().__init__(timeout=timeout)
                 self.func = func
 
-            @discord.ui.select(cls=discord.ui.Select, placeholder="選擇一些想要保留的情緒", options=options)
-            async def select_emotion(self, interaction: Interaction, select: discord.ui.Select):
-                await interaction.message.edit(content="已挑選: {}".format(", ".join(select.values)), view=None)
+            @discord.ui.select(cls=discord.ui.Select, 
+                               placeholder="選擇一些想要保留的情緒", options=options)
+            async def select_emotion(self, interaction: Interaction,
+                                      select: discord.ui.Select):
+                await interaction.message.edit(content="已挑選: {}"
+                                               .format(", ".join(select.values)), view=None)
                 await interaction.response.defer(thinking=True, ephemeral=True)
-                await self.func(interaction.guild, *map(lambda emotion: EmotionType[emotion.upper()], select.values))
-                await interaction.edit_original_response(content="成功完成篩選")
+                await self.func(interaction.guild, 
+                                *map(lambda emotion: EmotionType[emotion.upper()], select.values))
+                embed = discord.Embed(
+                    title="已成功完成篩選!",
+                    color=0x23fa4a,
+                    timestamp=datetime.now(),
+                )
+                await interaction.edit_original_response(embed=embed)
 
         view = View(self._keep)
-        
         await interaction.response.send_message(view=view)
 
     @app_commands.command(name="song", description="顯示第idx首歌曲")
@@ -191,4 +200,4 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
         
         await interaction.response.defer(thinking=True, ephemeral=True)
         embed = await self.playing_session[interaction.guild.id].queue.render()
-        await interaction.edit_original_response(embed=embed)
+        await interaction.edit_original_response(embed=embed)   
