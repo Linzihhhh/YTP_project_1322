@@ -14,3 +14,4 @@ temp
 Songs_
 *.mp3
 MusicEmotionRecognition
+model.pth
