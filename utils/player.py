@@ -143,7 +143,7 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
         )
         await interaction.edit_original_response(embed=embed)
 
-    @app_commands.command(name="filter", description="保留與要求情緒相符的歌曲")
+    @app_commands.command(name="filter", description="刪除與要求情緒相符的歌曲")
     async def keep(self, interaction: Interaction):
 
         options = list(map(lambda emotion: 
