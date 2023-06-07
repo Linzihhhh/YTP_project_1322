@@ -155,7 +155,7 @@ class PlayerCog(Player, PlayerBaseCog, commands.Cog):
                 self.func = func
 
             @discord.ui.select(cls=discord.ui.Select, 
-                               placeholder="選擇一些想要保留的情緒", options=options)
+                               placeholder="選擇一些想要刪除的情緒", options=options)
             async def select_emotion(self, interaction: Interaction,
                                       select: discord.ui.Select):
                 await interaction.message.edit(content="已挑選: {}"

@@ -179,9 +179,8 @@ class Playlist:
             result = await predictor.predict(f"{song.id}")
             await asyncio.sleep(0.1)
 
-            if EmotionType(result) in emotions:
+            if EmotionType(result) not in emotions:
                 playlist.append(song)
 
         self.playlist[1:] = playlist
 
-    

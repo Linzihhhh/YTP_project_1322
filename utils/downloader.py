@@ -68,17 +68,17 @@ class YoutubeDownloader:
 
             url = stdout.decode().split('\n')[0].strip()
 
-            ss = opts.get("ss") or "00:00:00.00"
-            t = opts.get("t") or "00:00:45.00"
+            ss = opts.get("ss") or "00:01:00.00"
+            t = opts.get("t") or "00:01:45.00"
 
-            # process = await asyncio.create_subprocess_shell(
-            #         f"ffmpeg -ss {ss} -i \"{url}\" -t {t} -n {path}/{id}.mp3", 
-            #         stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-            # stdout, stderr = await process.communicate()
             process = await asyncio.create_subprocess_shell(
-                    f"ffmpeg -i \"{url}\" -n {path}/{id}.mp3", 
+                    f"ffmpeg -ss {ss} -i \"{url}\" -t {t} -n {path}/{id}.mp3", 
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
             stdout, stderr = await process.communicate()
+            # process = await asyncio.create_subprocess_shell(
+            #         f"ffmpeg -i \"{url}\" -n {path}/{id}.mp3", 
+            #         stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+            # stdout, stderr = await process.communicate()
             if stderr:
                 raise Exception(stderr.decode())
 
